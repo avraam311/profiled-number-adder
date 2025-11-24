@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
 	"os/signal"
 	"runtime/trace"
@@ -21,7 +22,7 @@ const (
 )
 
 func main() {
-	f, err := os.Create("./trace/results_before_profiling/trace.out")
+	f, err := os.Create("./trace/results_after_profiling/trace.out")
 	if err != nil {
 		logger.Logger.Fatal().Err(err).Msg("failed to create trace file")
 	}
@@ -35,11 +36,12 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	logger.Init()
 	cfg := config.New()
 	if err := cfg.LoadConfigFiles(configFilePath); err != nil {
 		logger.Logger.Fatal().Err(err).Msg("failed to load config file")
 	}
+
+	logger.Init(cfg.GetBool("debug"))
 
 	srvcNums := serviceNumbers.New()
 	handNums := handlerNumbers.New(srvcNums)
@@ -47,7 +49,7 @@ func main() {
 	router := server.NewRouter(handNums)
 	srv := server.NewServer(cfg.GetString("server.port"), router)
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Logger.Fatal().Err(err).Msg("failed to run server")
 		}
 	}()

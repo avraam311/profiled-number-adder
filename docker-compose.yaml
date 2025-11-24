@@ -8,4 +8,4 @@ services:
       - "8080:8080"
     volumes:
       - ./logs:/app/logs
-      - ./trace/results_before_profiling:/app/trace/results_before_profiling
+      - ./trace/results_after_profiling:/app/trace/results_after_profiling

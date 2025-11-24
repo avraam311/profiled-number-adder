@@ -5,24 +5,36 @@ import (
 	"os"
 	"time"
 
+	"github.com/natefinch/lumberjack"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 type Zerolog = zerolog.Logger
 
 var Logger Zerolog
 
-func Init() {
+func Init(debug bool) {
 	consoleWriter := zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: time.RFC3339,
 	}
-	fileWriter, err := os.OpenFile("/app/logs/app.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to open log file")
+
+	// Setup rolling log file with lumberjack for safe rotation
+	fileWriter := &lumberjack.Logger{
+		Filename:   "/app/logs/app.log",
+		MaxSize:    50, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28,   // days
+		Compress:   true, // compress old logs
 	}
+
 	multi := io.MultiWriter(fileWriter, consoleWriter)
 
 	Logger = zerolog.New(multi).With().Timestamp().Logger()
+
+	if debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	} else {
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	}
 }

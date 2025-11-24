@@ -1,0 +1,8 @@
+goos: linux
+goarch: amd64
+pkg: github.com/avraam311/profiled-number-adder/benchmarks
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkAddUpHandler-8   	  103353	      9983 ns/op
+BenchmarkAddUp-8          	1000000000	         0.6300 ns/op
+PASS
+ok  	github.com/avraam311/profiled-number-adder/benchmarks	1.861s
