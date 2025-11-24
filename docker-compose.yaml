@@ -6,10 +6,6 @@ services:
     container_name: app
     ports:
       - "8080:8080"
-    networks:
-      - app-network
     volumes:
       - ./logs:/app/logs
-
-networks:
-  app-network:
+      - ./trace/results_before_profiling:/app/trace/results_before_profiling

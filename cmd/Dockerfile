@@ -14,7 +14,7 @@ WORKDIR /app
 
 RUN mkdir -p /app/logs
 
-COPY --from=build_base ./app .
+COPY --from=build_base /app/app .
 COPY ./config ./config
 
 EXPOSE 8080

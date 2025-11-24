@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	"os"
 	"os/signal"
+	"runtime/trace"
 	"syscall"
 	"time"
 
@@ -19,6 +21,17 @@ const (
 )
 
 func main() {
+	f, err := os.Create("./trace/results_before_profiling/trace.out")
+	if err != nil {
+		logger.Logger.Fatal().Err(err).Msg("failed to create trace file")
+	}
+	defer f.Close()
+
+	if err := trace.Start(f); err != nil {
+		logger.Logger.Fatal().Err(err).Msg("failed to start trace")
+	}
+	defer trace.Stop()
+
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 

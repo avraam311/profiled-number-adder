@@ -3,8 +3,10 @@ package server
 import (
 	"net/http"
 
-	"github.com/avraam311/profiled-number-adder/internal/api/http/handlers/numbers"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+
+	"github.com/avraam311/profiled-number-adder/internal/api/http/handlers/numbers"
 )
 
 func NewRouter(handlerNums *numbers.Handler) *gin.Engine {
@@ -14,6 +16,9 @@ func NewRouter(handlerNums *numbers.Handler) *gin.Engine {
 	{
 		numsGroup.POST("/add-up", handlerNums.AddUp)
 	}
+
+	debugGroup := e.Group("/debug/pprof")
+	pprof.RouteRegister(debugGroup, "")
 
 	return e
 }
